@@ -1,20 +1,28 @@
-import { useEffect, useState } from "react";
 import { IMenuModalProps } from ".";
+import { useEffect, useRef, useState } from "react";
 
-import DataGrid from "react-data-grid";
+import _sortBy from "lodash/sortBy";
 import _orderBy from "lodash/orderBy";
+import { Grid } from "@mui/material";
+import DataGrid from "react-data-grid";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import Modal from "@src/components/Modal";
 import { useProjectContext } from "@src/contexts/ProjectContext";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { StrikethroughSTwoTone, TableRowsSharp } from "@mui/icons-material";
-import { mdiConsoleLine } from "@mdi/js";
-import { monitorEventLoopDelay } from "perf_hooks";
+import useCombinedRefs from "@src/hooks/useCombinedRefs";
+import { MoreVertTwoTone, RowingSharp, Umbrella } from "@mui/icons-material";
+import { tableSettings } from "@src/components/TableSettings/form";
+import { mdiArrangeBringForward } from "@mdi/js";
+import { arrayMover } from "@src/utils/fns";
 
 export interface IArrangeColummns extends IMenuModalProps {
   data: any;
 }
+
+export const RowTypes = {
+  ROW: "ROW_DRAG",
+};
 
 export default function ArrangeColumn({
   fieldName,
@@ -51,6 +59,14 @@ export default function ArrangeColumn({
 }
 
 function ModalChildren() {
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <Container />
+    </DndProvider>
+  );
+}
+
+function Container() {
   const column = [
     {
       key: "indexNum",
@@ -76,24 +92,6 @@ function ModalChildren() {
   const [rows, setRows] = useState<any[]>([]);
   const { tableState } = useProjectContext();
 
-  const MovableItem = () => {
-    const [{ isDragging }, drag] = useDrag({
-      item: { name: "An", type: "test" },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    });
-  };
-
-  const [{ canDrop, isOver }, drop] = useDrop({
-    accept: "Not type",
-    drop: () => ({ name: "some name" }),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
-  });
-
   useEffect(() => {
     const isLoadingCol = Boolean(tableState?.loadingColumns);
     const hasCol = Boolean(tableState?.columns);
@@ -101,10 +99,10 @@ function ModalChildren() {
     if (!isLoadingCol && hasCol) {
       const _columns = _orderBy(Object.values(tableState?.columns!), "index");
 
-      const _rows = _columns.map((column, indx) => {
+      const _rows = _columns.map((column, index) => {
         return {
-          id: indx,
-          indexNum: indx,
+          //id: index,
+          //index: index,
           columnName: column.name,
           draggable: true,
         };
@@ -114,9 +112,55 @@ function ModalChildren() {
     }
   }, [tableState?.loadingColumns, tableState?.columns]);
 
+  function arrangeRow(sourceIndex, targetIndex) {
+    const newRows = Array.from(rows, (row, index) => {
+      if (index === sourceIndex) return rows[targetIndex];
+      if (index === targetIndex) return rows[sourceIndex];
+      return row;
+    });
+
+    setRows(newRows);
+  }
+
+  function renderRow(i: number) {
+    return (
+      <div key={i}>
+        <Row>
+          <Cell index={i} data={rows[i]} arrangeRow={arrangeRow} />
+        </Row>
+      </div>
+    );
+  }
+
+  return <div>{rows.map((row, index) => renderRow(index))}</div>;
+}
+
+function Row({ children }: any) {
+  return <div>{children}</div>;
+}
+
+function Cell({ index, data, arrangeRow }: any) {
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: "ROW_DRAG", cellIndex: index },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isOver }, drop] = useDrop({
+    accept: "ROW_DRAG",
+    drop: ({ cellIndex }: any) => arrangeRow(cellIndex, index),
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
+    }),
+  });
+  const ref = useCombinedRefs(drag, drop);
+
   return (
-    <DndProvider backend={HTML5Backend}>
-      <DataGrid rows={rows} columns={column} />
-    </DndProvider>
+    <div ref={ref}>
+      {index}
+      {data.columnName}
+    </div>
   );
 }
