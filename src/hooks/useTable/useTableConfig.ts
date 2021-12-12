@@ -71,6 +71,15 @@ const useTableConfig = (tablePath?: string) => {
     });
   };
 
+  const arrangeColumn = () => {
+    const { columns } = tableConfigState;
+
+    documentDispatch({
+      action: DocActions.update,
+      datat: { columns: columns },
+    });
+  };
+
   /**  used for updating the width of column
    *  @param index of column.
    *  @param width number of pixels, eg: 120
@@ -128,6 +137,7 @@ const useTableConfig = (tablePath?: string) => {
    * @param draggedColumnKey column being repositioned.
    * @param droppedColumnKey column being .
    */
+
   const reorder = (draggedColumnKey: string, droppedColumnKey: string) => {
     const { columns } = tableConfigState;
     const oldIndex = columns[draggedColumnKey].index;
@@ -160,6 +170,7 @@ const useTableConfig = (tablePath?: string) => {
     updateColumn,
     updateConfig,
     addColumn,
+    arrangeColumn,
     resize,
     setTable,
     remove,

@@ -1,6 +1,6 @@
 import { Grid, Stack, Typography, Button, Divider } from "@mui/material";
 import ImportIcon from "@src/assets/icons/Import";
-import AddColumnIcon from "@src/assets/icons/AddColumn";
+import AddColumnIcon from "@src/assets/icons/AddColumns";
 
 import { APP_BAR_HEIGHT } from "@src/components/Navigation";
 

@@ -1,9 +1,11 @@
 import useTableData from "./useTableData";
 import useTableConfig from "./useTableConfig";
+import { FunctionInterpolation } from "@emotion/react";
 export type TableActions = {
   // TODO: Stricter types here
   column: {
     add: Function;
+    arrange: Function;
     resize: (index: number, width: number) => void;
     rename: Function;
     remove: Function;
@@ -89,6 +91,7 @@ export default function useTable() {
   const actions: TableActions = {
     column: {
       add: configActions.addColumn,
+      arrange: configActions.arrangeColumn,
       resize: configActions.resize,
       rename: configActions.rename,
       update: configActions.updateColumn,

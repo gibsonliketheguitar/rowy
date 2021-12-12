@@ -135,6 +135,8 @@ export default function Table() {
       [columns, tableState?.rows]
     ) ?? [];
 
+  console.log("what is rows", rows);
+
   const rowsContainerRef = useRef<HTMLDivElement>(null);
   const [selectedRowsSet, setSelectedRowsSet] = useState<Set<React.Key>>();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
