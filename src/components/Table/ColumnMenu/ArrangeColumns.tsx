@@ -3,29 +3,19 @@ import { useEffect, useRef, useState } from "react";
 
 import _sortBy from "lodash/sortBy";
 import _orderBy from "lodash/orderBy";
-import { Grid } from "@mui/material";
-import DataGrid from "react-data-grid";
+import DataGrid, { Row, RowRendererProps } from "react-data-grid";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import Modal from "@src/components/Modal";
 import { useProjectContext } from "@src/contexts/ProjectContext";
 import useCombinedRefs from "@src/hooks/useCombinedRefs";
-import { MoreVertTwoTone, RowingSharp, Umbrella } from "@mui/icons-material";
-import { tableSettings } from "@src/components/TableSettings/form";
-import { mdiArrangeBringForward } from "@mdi/js";
-import { arrayMover } from "@src/utils/fns";
 
 export interface IArrangeColummns extends IMenuModalProps {
   data: any;
 }
 
-export const RowTypes = {
-  ROW: "ROW_DRAG",
-};
-
 export default function ArrangeColumn({
-  fieldName,
   open,
   handleClose,
   handleSave,
@@ -67,10 +57,10 @@ function ModalChildren() {
 }
 
 function Container() {
-  const column = [
+  const columns = [
     {
-      key: "indexNum",
-      name: "index",
+      key: "order",
+      name: "order",
       type: "Arrange_Column",
       index: 0,
       width: 80,
@@ -79,7 +69,7 @@ function Container() {
       editable: false,
     },
     {
-      key: "columnName",
+      key: "name",
       name: "Column Name",
       type: "Arrange_Column",
       index: 0,
@@ -93,18 +83,16 @@ function Container() {
   const { tableState } = useProjectContext();
 
   useEffect(() => {
+    console.log("firing");
     const isLoadingCol = Boolean(tableState?.loadingColumns);
     const hasCol = Boolean(tableState?.columns);
 
     if (!isLoadingCol && hasCol) {
       const _columns = _orderBy(Object.values(tableState?.columns!), "index");
-
       const _rows = _columns.map((column, index) => {
         return {
-          //id: index,
-          //index: index,
-          columnName: column.name,
-          draggable: true,
+          order: index,
+          name: column.name,
         };
       });
 
@@ -113,54 +101,52 @@ function Container() {
   }, [tableState?.loadingColumns, tableState?.columns]);
 
   function arrangeRow(sourceIndex, targetIndex) {
-    const newRows = Array.from(rows, (row, index) => {
-      if (index === sourceIndex) return rows[targetIndex];
-      if (index === targetIndex) return rows[sourceIndex];
-      return row;
-    });
+    console.log(sourceIndex, targetIndex);
 
+    const newRows = Array.from(
+      rows.map((row, indx) => {
+        if (indx === sourceIndex)
+          return { order: sourceIndex, name: rows[targetIndex].name };
+        if (indx === targetIndex)
+          return { order: targetIndex, name: rows[sourceIndex].name };
+        return row;
+      })
+    );
     setRows(newRows);
   }
 
-  function renderRow(i: number) {
-    return (
-      <div key={i}>
-        <Row>
-          <Cell index={i} data={rows[i]} arrangeRow={arrangeRow} />
-        </Row>
-      </div>
-    );
+  useEffect(() => {
+    console.log(rows);
+  }, [rows]);
+
+  function MyRowRenderer(props: RowRendererProps<typeof Row>) {
+    const [{ isDragging }, drag] = useDrag({
+      item: { type: "ROW_DRAG", cellIndex: props.rowIdx },
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+    });
+
+    const [{ isOver }, drop] = useDrop({
+      accept: "ROW_DRAG",
+      drop: ({ cellIndex }: any) => arrangeRow(cellIndex, props.rowIdx),
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+        canDrop: !!monitor.canDrop(),
+      }),
+    });
+
+    const ref = useCombinedRefs(drag, drop);
+
+    return <Row ref={ref} {...props} />;
   }
 
-  return <div>{rows.map((row, index) => renderRow(index))}</div>;
-}
-
-function Row({ children }: any) {
-  return <div>{children}</div>;
-}
-
-function Cell({ index, data, arrangeRow }: any) {
-  const [{ isDragging }, drag] = useDrag({
-    item: { type: "ROW_DRAG", cellIndex: index },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
-
-  const [{ isOver }, drop] = useDrop({
-    accept: "ROW_DRAG",
-    drop: ({ cellIndex }: any) => arrangeRow(cellIndex, index),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-      canDrop: !!monitor.canDrop(),
-    }),
-  });
-  const ref = useCombinedRefs(drag, drop);
-
   return (
-    <div ref={ref}>
-      {index}
-      {data.columnName}
-    </div>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      rowRenderer={MyRowRenderer}
+      onRowsChange={setRows}
+    />
   );
 }
