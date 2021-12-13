@@ -71,12 +71,17 @@ const useTableConfig = (tablePath?: string) => {
     });
   };
 
-  const arrangeColumn = () => {
+  const arrangeColumn = (arrangedCol: any) => {
     const { columns } = tableConfigState;
+
+    const newColumns: any = arrangedCol.reduce((acc, curr) => {
+      acc[curr.key] = { ...columns[curr.key], index: curr.index };
+      return acc;
+    }, {});
 
     documentDispatch({
       action: DocActions.update,
-      datat: { columns: columns },
+      data: { columns: newColumns },
     });
   };
 
@@ -151,6 +156,7 @@ const useTableConfig = (tablePath?: string) => {
       .forEach((column: any, index) => {
         updatedColumns[column.key] = { ...column, index };
       });
+
     documentDispatch({
       action: DocActions.update,
       data: { columns: updatedColumns },

@@ -1,8 +1,8 @@
 import { IMenuModalProps } from ".";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import _sortBy from "lodash/sortBy";
 import _orderBy from "lodash/orderBy";
+import _sortBy from "lodash/sortBy";
 import DataGrid, { Row, RowRendererProps } from "react-data-grid";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -11,33 +11,57 @@ import Modal from "@src/components/Modal";
 import { useProjectContext } from "@src/contexts/ProjectContext";
 import useCombinedRefs from "@src/hooks/useCombinedRefs";
 
-export interface IArrangeColummns extends IMenuModalProps {
-  data: any;
-}
-
-export default function ArrangeColumn({
-  open,
-  handleClose,
-  handleSave,
-}: IMenuModalProps) {
+export default function ArrangeColumn({ open, handleClose }: IMenuModalProps) {
   const { tableState, tableActions } = useProjectContext();
-  if (!open) return null;
-  console.log("project context", tableState, tableActions);
+  const [arr, setArr] = useState<any[]>([]);
+  const columns = [
+    {
+      key: "index",
+      name: "Order",
+      type: "Arrange_Column",
+      index: 0,
+      width: 90,
+      headerCellClass: "arrange-column-index-header",
+      cellClass: "arrange-column-index-cell",
+      editable: false,
+    },
+    {
+      key: "name",
+      name: "Column Name",
+      type: "Arrange_Column",
+      index: 0,
+      width: 220,
+      headerCellClass: "arrange-column-name-header",
+      cellClass: "arrange-column-name-cell",
+      editable: false,
+    },
+  ];
 
+  useEffect(() => {
+    if (!tableState?.loadingColumns && tableState?.columns) {
+      const _rows = _orderBy(Object.values(tableState?.columns!), "index");
+      setArr(_rows);
+    }
+  }, [tableState?.loadingColumns, tableState?.columns]);
+
+  if (!open) return null;
   return (
     <Modal
       onClose={handleClose}
       title="Arrange Columns"
       maxWidth="xs"
-      children={<ModalChildren />}
+      children={
+        <DndProvider backend={HTML5Backend}>
+          <Container arr={arr} setArr={setArr} columns={columns} />
+        </DndProvider>
+      }
       actions={{
         primary: {
           onClick: () => {
-            //handleSave(fieldName, { name: newName });
+            tableActions?.column.arrange(arr);
             handleClose();
           },
-
-          children: "Update",
+          children: "Arrange",
         },
         secondary: {
           onClick: handleClose,
@@ -48,76 +72,17 @@ export default function ArrangeColumn({
   );
 }
 
-function ModalChildren() {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Container />
-    </DndProvider>
-  );
-}
-
-function Container() {
-  const columns = [
-    {
-      key: "order",
-      name: "order",
-      type: "Arrange_Column",
-      index: 0,
-      width: 80,
-      headerCellClass: "arrange-column-header",
-      cellClass: "arrange-column-cell",
-      editable: false,
-    },
-    {
-      key: "name",
-      name: "Column Name",
-      type: "Arrange_Column",
-      index: 0,
-      width: 204,
-      headerCellClass: "arrange-column-header",
-      cellClass: "arrange-column-cell",
-      editable: false,
-    },
-  ];
-  const [rows, setRows] = useState<any[]>([]);
-  const { tableState } = useProjectContext();
-
-  useEffect(() => {
-    console.log("firing");
-    const isLoadingCol = Boolean(tableState?.loadingColumns);
-    const hasCol = Boolean(tableState?.columns);
-
-    if (!isLoadingCol && hasCol) {
-      const _columns = _orderBy(Object.values(tableState?.columns!), "index");
-      const _rows = _columns.map((column, index) => {
-        return {
-          order: index,
-          name: column.name,
-        };
-      });
-
-      setRows(_rows);
-    }
-  }, [tableState?.loadingColumns, tableState?.columns]);
-
-  function arrangeRow(sourceIndex, targetIndex) {
-    console.log(sourceIndex, targetIndex);
-
-    const newRows = Array.from(
-      rows.map((row, indx) => {
-        if (indx === sourceIndex)
-          return { order: sourceIndex, name: rows[targetIndex].name };
-        if (indx === targetIndex)
-          return { order: targetIndex, name: rows[sourceIndex].name };
+function Container({ arr, columns, setArr }: any) {
+  function arrangeRow(sourceIndex: number, targetIndex: number) {
+    const newArr = Array.from(
+      arr.map((row, index) => {
+        if (index === sourceIndex) return { ...arr[targetIndex], index };
+        if (index === targetIndex) return { ...arr[sourceIndex], index };
         return row;
       })
     );
-    setRows(newRows);
+    setArr(newArr);
   }
-
-  useEffect(() => {
-    console.log(rows);
-  }, [rows]);
 
   function MyRowRenderer(props: RowRendererProps<typeof Row>) {
     const [{ isDragging }, drag] = useDrag({
@@ -143,10 +108,10 @@ function Container() {
 
   return (
     <DataGrid
-      rows={rows}
+      className="rdg-light"
+      rows={arr}
       columns={columns}
       rowRenderer={MyRowRenderer}
-      onRowsChange={setRows}
     />
   );
 }
