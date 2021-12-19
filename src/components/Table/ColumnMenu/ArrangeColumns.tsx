@@ -74,13 +74,11 @@ export default function ArrangeColumn({ open, handleClose }: IMenuModalProps) {
 
 function Container({ arr, columns, setArr }: any) {
   function arrangeRow(sourceIndex: number, targetIndex: number) {
-    const newArr = Array.from(
-      arr.map((row, index) => {
-        if (index === sourceIndex) return { ...arr[targetIndex], index };
-        if (index === targetIndex) return { ...arr[sourceIndex], index };
-        return row;
-      })
-    );
+    const newArr = arr.map((row, index) => {
+      if (index === sourceIndex) return { ...arr[targetIndex], index };
+      if (index === targetIndex) return { ...arr[sourceIndex], index };
+      return row;
+    });
     setArr(newArr);
   }
 
