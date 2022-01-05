@@ -13,6 +13,7 @@ import useTable, { TableActions, TableState } from "@src/hooks/useTable";
 import useSettings from "@src/hooks/useSettings";
 import { useAppContext } from "./AppContext";
 import { SideDrawerRef } from "@src/components/SideDrawer";
+import { CellMenuRef } from "@src/components/Table/CellMenu";
 import { ColumnMenuRef } from "@src/components/Table/ColumnMenu";
 import { ImportWizardRef } from "@src/components/Wizards/ImportWizard";
 
@@ -60,6 +61,10 @@ export interface IProjectContext {
     ignoreRequiredFields?: boolean
   ) => void;
   deleteRow: (rowId) => void;
+  deleteCell: (
+    rowRef: firebase.firestore.DocumentReference,
+    fieldValue: string
+  ) => void;
   updateCell: (
     ref: firebase.firestore.DocumentReference,
     fieldName: string,
@@ -99,6 +104,8 @@ export interface IProjectContext {
   dataGridRef: React.RefObject<DataGridHandle>;
   // A ref to the side drawer state. Prevents unnecessary re-renders
   sideDrawerRef: React.MutableRefObject<SideDrawerRef | undefined>;
+  //A ref to the cell menu. Prevents unnecessary re-render
+  cellMenuRef: React.MutableRefObject<CellMenuRef | undefined>;
   // A ref to the column menu. Prevents unnecessary re-renders
   columnMenuRef: React.MutableRefObject<ColumnMenuRef | undefined>;
   // A ref ot the import wizard. Prevents unnecessary re-renders
@@ -289,6 +296,18 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
     return;
   };
 
+  const deleteCell: IProjectContext["deleteCell"] = (rowRef, fieldValue) => {
+    console.log("delete cell");
+    rowRef
+      .update({
+        [fieldValue]: firebase.firestore.FieldValue.delete(),
+      })
+      .then(
+        () => console.log("Field Value deleted"),
+        (error) => console.error("Failed to delete", error)
+      );
+  };
+
   const updateCell: IProjectContext["updateCell"] = (
     ref,
     fieldName,
@@ -296,9 +315,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
     onSuccess
   ) => {
     if (value === undefined) return;
-
     const update = { [fieldName]: value };
-
     if (table?.audit !== false) {
       update[table?.auditFieldUpdatedBy || "_updatedBy"] = rowyUser(
         currentUser!,
@@ -385,6 +402,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
   const dataGridRef = useRef<DataGridHandle>(null);
   const sideDrawerRef = useRef<SideDrawerRef>();
   const columnMenuRef = useRef<ColumnMenuRef>();
+  const cellMenuRef = useRef<CellMenuRef>();
   const importWizardRef = useRef<ImportWizardRef>();
 
   return (
@@ -394,6 +412,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
         tableActions,
         addRow,
         addRows,
+        deleteCell,
         updateCell,
         deleteRow,
         settingsActions,
@@ -403,6 +422,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
         table,
         dataGridRef,
         sideDrawerRef,
+        cellMenuRef,
         columnMenuRef,
         importWizardRef,
         rowyRun: _rowyRun,

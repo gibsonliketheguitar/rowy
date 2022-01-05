@@ -17,6 +17,7 @@ import DataGrid, {
 import Loading from "@src/components/Loading";
 import TableContainer, { OUT_OF_ORDER_MARGIN } from "./TableContainer";
 import TableHeader from "../TableHeader";
+import CellMenu from "./CellMenu";
 import ColumnHeader from "./ColumnHeader";
 import ColumnMenu from "./ColumnMenu";
 import FinalColumnHeader from "./FinalColumnHeader";
@@ -43,8 +44,14 @@ const rowClass = (row: any) => (row._rowy_outOfOrder ? "out-of-order" : "");
 //const SelectColumn = { ..._SelectColumn, width: 42, maxWidth: 42 };
 
 export default function Table() {
-  const { tableState, tableActions, dataGridRef, sideDrawerRef, updateCell } =
-    useProjectContext();
+  const {
+    tableState,
+    tableActions,
+    dataGridRef,
+    cellMenuRef,
+    sideDrawerRef,
+    updateCell,
+  } = useProjectContext();
   const { userDoc } = useAppContext();
 
   const userDocHiddenFields =
@@ -245,14 +252,21 @@ export default function Table() {
                   });
                 }
               }}
+              onSelectedCellChange={({ rowIdx, idx }) => {
+                if (cellMenuRef?.current)
+                  cellMenuRef?.current?.setSelectedCell({
+                    rowIndex: rowIdx,
+                    colIndex: idx,
+                  });
+              }}
             />
           </DndProvider>
         ) : (
           <Loading message="Fetching columns" />
         )}
       </TableContainer>
-
       <ColumnMenu />
+      <CellMenu />
       <BulkActions
         selectedRows={selectedRows}
         columns={columns}

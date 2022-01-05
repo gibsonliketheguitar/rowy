@@ -117,7 +117,15 @@ const useTableConfig = (tablePath?: string) => {
    */
   const remove = (key: string) => {
     const { columns } = tableConfigState;
-    let updatedColumns = columns;
+
+    let updatedColumns: any = Object.values(columns)
+      .filter((c: any) => c.key !== key)
+      .sort((c: any) => c.index)
+      .reduce((acc: any, curr: any, index: any) => {
+        acc[curr.key] = { ...curr, index };
+        return acc;
+      }, {});
+
     updatedColumns[key] = deleteField();
     documentDispatch({
       action: DocActions.update,

@@ -89,7 +89,7 @@ export default function ColumnMenu() {
       setModal({
         type: ModalStates.new,
         data: {
-          initializeColumn: { index: column.index ? column.index + 1 : 0 },
+          initializeColumn: { index: column.index ? column.index : 0 },
         },
       });
     }
