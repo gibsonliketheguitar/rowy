@@ -61,6 +61,10 @@ export interface IProjectContext {
     ignoreRequiredFields?: boolean
   ) => void;
   deleteRow: (rowId) => void;
+  deleteCell: (
+    rowRef: firebase.firestore.DocumentReference,
+    fieldValue: string
+  ) => void;
   updateCell: (
     ref: firebase.firestore.DocumentReference,
     fieldName: string,
@@ -292,6 +296,17 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
     return;
   };
 
+  const deleteCell: IProjectContext["deleteCell"] = (rowRef, fieldValue) => {
+    rowRef
+      .update({
+        [fieldValue]: firebase.firestore.FieldValue.delete(),
+      })
+      .then(
+        () => console.log("Field Value deleted"),
+        (error) => console.error("Failed to delete", error)
+      );
+  };
+
   const updateCell: IProjectContext["updateCell"] = (
     ref,
     fieldName,
@@ -299,9 +314,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
     onSuccess
   ) => {
     if (value === undefined) return;
-
     const update = { [fieldName]: value };
-
     if (table?.audit !== false) {
       update[table?.auditFieldUpdatedBy || "_updatedBy"] = rowyUser(
         currentUser!,
@@ -398,6 +411,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
         tableActions,
         addRow,
         addRows,
+        deleteCell,
         updateCell,
         deleteRow,
         settingsActions,
