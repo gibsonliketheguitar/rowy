@@ -1,12 +1,13 @@
 import React from "react";
+import { atom, useAtom } from "jotai";
+import _find from "lodash/find";
 import { PopoverProps } from "@mui/material";
+
 import CopyCells from "@src/assets/icons/CopyCells";
 import Paste from "@src/assets/icons/Paste";
 import { useProjectContext } from "@src/contexts/ProjectContext";
+
 import { MenuContents } from "./MenuContent";
-import _find from "lodash/find";
-import { atom, useAtom } from "jotai";
-import PasteFromClipboard from "@src/assets/icons/PasteFromClipboard";
 
 export const cellMenuDataAtom = atom("");
 
@@ -59,16 +60,8 @@ export default function CellMenu() {
       index: selectedCell.colIndex,
     });
     const targetRow = tableState.rows[selectedCell.rowIndex];
-    if (cellMenuData) updateCell(targetRow.ref, targetCol.key, cellMenuData);
-    handleClose();
-  };
-
-  const handlePasteFromClipboard = () => {
     const paste = navigator.clipboard.readText();
-    const targetCol = _find(tableState.columns, {
-      index: selectedCell.colIndex,
-    });
-    const targetRow = tableState.rows[selectedCell.rowIndex];
+
     paste.then((clipText) =>
       updateCell(targetRow.ref, targetCol.key, clipText)
     );
@@ -77,11 +70,6 @@ export default function CellMenu() {
   const cellMenuAction = [
     { label: "Copy", icon: <CopyCells />, onClick: handleCopy },
     { label: "Paste", icon: <Paste />, onClick: handlePaste },
-    {
-      label: "Paste from Clipboard",
-      icon: <PasteFromClipboard />,
-      onClick: handlePasteFromClipboard,
-    },
   ];
 
   if (!cellMenuRef.current || !open) return <></>;
