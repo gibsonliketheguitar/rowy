@@ -297,6 +297,7 @@ export const ProjectContextProvider: React.FC = ({ children }) => {
   };
 
   const deleteCell: IProjectContext["deleteCell"] = (rowRef, fieldValue) => {
+    console.log("delete cell");
     rowRef
       .update({
         [fieldValue]: firebase.firestore.FieldValue.delete(),
