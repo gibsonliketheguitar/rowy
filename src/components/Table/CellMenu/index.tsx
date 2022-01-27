@@ -6,6 +6,7 @@ import { getFieldProp } from "@src/components/fields";
 import { useProjectContext } from "@src/contexts/ProjectContext";
 
 import { MenuContents } from "./MenuContent";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 export type SelectedCell = {
   rowIndex: number;
@@ -44,8 +45,8 @@ export default function CellMenu() {
     function empty() {};
   const actions = getActions() || [];
   const hasNoActions = Boolean(actions.length === 0);
-
   if (!cellMenuRef.current || !open || hasNoActions) return <></>;
+
   return (
     <MenuContents
       anchorEl={anchorEl}

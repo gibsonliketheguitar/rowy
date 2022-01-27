@@ -5,7 +5,7 @@ import withHeavyCell from "../_withTableCell/withHeavyCell";
 import IdIcon from "@src/assets/icons/Id";
 import BasicCell from "../_BasicCell/BasicCellValue";
 import withSideDrawerEditor from "@src/components/Table/editors/withSideDrawerEditor";
-import BasicContextMenu from "../_BasicCell/BasicContextMenu";
+import BasicContextMenuActions from "../_BasicCell/BasicContextMenuActions";
 
 const TableCell = lazy(
   () => import("./TableCell" /* webpackChunkName: "TableCell-Id" */)
@@ -21,6 +21,7 @@ export const config: IFieldConfig = {
   dataType: "string",
   initialValue: "",
   icon: <IdIcon />,
+  contextMenuActions: BasicContextMenuActions,
   description: "Displays the row’s ID. Read-only. Cannot be sorted.",
   TableCell: withHeavyCell(BasicCell, TableCell),
   TableEditor: withSideDrawerEditor(TableCell),

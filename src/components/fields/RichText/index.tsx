@@ -5,7 +5,7 @@ import withHeavyCell from "../_withTableCell/withHeavyCell";
 import RichTextIcon from "@mui/icons-material/TextFormat";
 import BasicCell from "../_BasicCell/BasicCellNull";
 import withSideDrawerEditor from "@src/components/Table/editors/withSideDrawerEditor";
-import BasicContextMenu from "../_BasicCell/BasicContextMenu";
+import BasicContextMenuActions from "../_BasicCell/BasicContextMenuActions";
 
 const TableCell = lazy(
   () => import("./TableCell" /* webpackChunkName: "TableCell-RichText" */)
@@ -26,7 +26,7 @@ export const config: IFieldConfig = {
   initializable: true,
   icon: <RichTextIcon />,
   description: "HTML edited with a rich text editor.",
-  contextMenuActions: BasicContextMenu,
+  contextMenuActions: BasicContextMenuActions,
   TableCell: withHeavyCell(BasicCell, TableCell),
   TableEditor: withSideDrawerEditor(TableCell),
   SideDrawerField,

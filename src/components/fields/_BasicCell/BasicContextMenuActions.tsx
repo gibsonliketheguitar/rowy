@@ -4,12 +4,12 @@ import Cut from "@src/assets/icons/Cut";
 import Paste from "@src/assets/icons/Paste";
 import { useProjectContext } from "@src/contexts/ProjectContext";
 
-export default function BasicContextMenu() {
+export default function BasicContextMenuActions() {
   const { cellMenuRef, tableState } = useProjectContext();
   const { columns, rows }: any = tableState;
   const selectedRowIndex = cellMenuRef?.current?.selectedCell
     .rowIndex as number;
-  const selectedColIndex = cellMenuRef?.current?.selectedCell.colIndex;
+  const selectedColIndex = cellMenuRef?.current?.selectedCell?.colIndex;
   const selectedCol = _find(columns, { index: selectedColIndex });
   const selectedRow = rows?.[selectedRowIndex];
 
