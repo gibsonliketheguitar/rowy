@@ -5,6 +5,7 @@ import withHeavyCell from "../_withTableCell/withHeavyCell";
 import IdIcon from "@src/assets/icons/Id";
 import BasicCell from "../_BasicCell/BasicCellValue";
 import withSideDrawerEditor from "@src/components/Table/editors/withSideDrawerEditor";
+import BasicContextMenu from "../_BasicCell/BasicContextMenu";
 
 const TableCell = lazy(
   () => import("./TableCell" /* webpackChunkName: "TableCell-Id" */)

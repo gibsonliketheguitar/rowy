@@ -6,6 +6,7 @@ import LongTextIcon from "@mui/icons-material/Notes";
 import BasicCell from "./BasicCell";
 import TextEditor from "@src/components/Table/editors/TextEditor";
 import { filterOperators } from "../ShortText/Filter";
+import BasicContextMenu from "../_BasicCell/BasicContextMenu";
 
 const SideDrawerField = lazy(
   () =>
@@ -23,6 +24,7 @@ export const config: IFieldConfig = {
   initializable: true,
   icon: <LongTextIcon />,
   description: "Text displayed on multiple lines.",
+  contextMenuActions: BasicContextMenu,
   TableCell: withBasicCell(BasicCell),
   TableEditor: TextEditor,
   SideDrawerField,

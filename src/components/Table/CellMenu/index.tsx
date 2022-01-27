@@ -36,14 +36,16 @@ export default function CellMenu() {
       selectedCell,
       setSelectedCell,
     } as {};
-  if (!cellMenuRef.current || !open) return <></>;
 
   const selectedColIndex = selectedCell?.colIndex;
   const selectedCol = _find(tableState?.columns, { index: selectedColIndex });
-  const actions = getFieldProp("contextMenuActions", selectedCol.type) || [];
-  const hasNoAction = Boolean(actions);
+  const getActions =
+    getFieldProp("contextMenuActions", selectedCol?.type) ||
+    function empty() {};
+  const actions = getActions() || [];
+  const hasNoActions = Boolean(actions.length === 0);
 
-  if (hasNoAction) return <></>;
+  if (!cellMenuRef.current || !open || hasNoActions) return <></>;
   return (
     <MenuContents
       anchorEl={anchorEl}

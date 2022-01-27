@@ -6,6 +6,7 @@ import UrlIcon from "@mui/icons-material/Link";
 import TableCell from "./TableCell";
 import TextEditor from "@src/components/Table/editors/TextEditor";
 import { filterOperators } from "../ShortText/Filter";
+import BasicContextMenu from "../_BasicCell/BasicContextMenu";
 
 const SideDrawerField = lazy(
   () =>
@@ -21,6 +22,7 @@ export const config: IFieldConfig = {
   initializable: true,
   icon: <UrlIcon />,
   description: "Web address. Not validated.",
+  contextMenuActions: BasicContextMenu,
   TableCell: withBasicCell(TableCell),
   TableEditor: TextEditor,
   SideDrawerField,
