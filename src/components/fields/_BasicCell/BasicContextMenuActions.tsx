@@ -5,27 +5,55 @@ import Paste from "@src/assets/icons/Paste";
 import { useProjectContext } from "@src/contexts/ProjectContext";
 
 export default function BasicContextMenuActions() {
-  const { cellMenuRef, tableState } = useProjectContext();
-  const { columns, rows }: any = tableState;
+  const { cellMenuRef, tableState, deleteCell, updateCell } =
+    useProjectContext();
+
   const selectedRowIndex = cellMenuRef?.current?.selectedCell
     .rowIndex as number;
   const selectedColIndex = cellMenuRef?.current?.selectedCell?.colIndex;
-  const selectedCol = _find(columns, { index: selectedColIndex });
-  const selectedRow = rows?.[selectedRowIndex];
+  const selectedCol = _find(tableState?.columns, { index: selectedColIndex });
+  const selectedRow = tableState?.rows?.[selectedRowIndex];
 
-  const handleCopy = () => {
-    const cell = selectedRow[selectedCol.key];
-    console.log("what is cell", cell);
+  const onClose = () => {
+    cellMenuRef?.current?.setSelectedCell(null);
+    cellMenuRef?.current?.setAnchorEl(null);
   };
 
-  const handleCut = () => {};
+  const handleCopy = () => {
+    const cell = selectedRow?.[selectedCol.key];
+    const onFail = () => console.log("Fail to copy");
+    const onSuccess = () => console.log("Save to clipboard successful");
+    const copy = navigator.clipboard.writeText(JSON.stringify(cell));
+    copy.then(onSuccess, onFail);
+    //onClose()
+  };
 
-  const handlePaste = () => {};
+  const handleCut = () => {
+    handleCopy();
+    if (deleteCell) {
+      deleteCell(selectedRow?.ref, selectedCol?.key);
+    }
+  };
 
-  const cellMenuAction = [
-    { label: "Cut", icon: <Cut />, onClick: handleCut },
-    { label: "Copy", icon: <CopyCells />, onClick: handleCopy },
-    { label: "Paste", icon: <Paste />, onClick: handlePaste },
-  ];
-  return cellMenuAction;
+  const handlePaste = () => {
+    const paste = navigator.clipboard.readText();
+    paste.then(async (clipText) => {
+      try {
+        const paste = await JSON.parse(clipText);
+        updateCell?.(selectedRow?.ref, selectedCol.key, paste);
+      } catch (error) {
+        //TODO check the coding style guide about error message
+        //Add breadcrumb handler her
+        console.log(error);
+      }
+    });
+
+    const cellMenuAction = [
+      { label: "Cut", icon: <Cut />, onClick: handleCut },
+      { label: "Copy", icon: <CopyCells />, onClick: handleCopy },
+      { label: "Paste", icon: <Paste />, onClick: handlePaste },
+    ];
+    console.log("redturing");
+    return cellMenuAction;
+  };
 }

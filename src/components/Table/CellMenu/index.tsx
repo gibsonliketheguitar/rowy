@@ -23,12 +23,15 @@ export type CellMenuRef = {
 };
 
 export default function CellMenu() {
-  const { cellMenuRef, deleteCell, tableState, updateCell }: any =
-    useProjectContext();
+  const { cellMenuRef, tableState }: any = useProjectContext();
   const [anchorEl, setAnchorEl] = React.useState<any | null>(null);
   const [selectedCell, setSelectedCell] = React.useState<any | null>();
   const open = Boolean(anchorEl);
-  const handleClose = () => setAnchorEl(null);
+
+  const handleClose = () => {
+    //setSelectedCell(null)
+    setAnchorEl(null);
+  };
 
   if (cellMenuRef)
     cellMenuRef.current = {
@@ -43,8 +46,12 @@ export default function CellMenu() {
   const getActions =
     getFieldProp("contextMenuActions", selectedCol?.type) ||
     function empty() {};
-  const actions = getActions() || [];
-  const hasNoActions = Boolean(actions.length === 0);
+  const actions = getActions() ?? [];
+  console.log("what is actions", actions);
+  const hasNoActions = Boolean(actions?.length === 0) ?? true;
+  console.log(selectedCol);
+  console.log("cellMenuRef", cellMenuRef.current, open, hasNoActions);
+  console.log(tableState.columns);
   if (!cellMenuRef.current || !open || hasNoActions) return <></>;
 
   return (

@@ -29,7 +29,8 @@ export default function NewColumn({
   handleClose,
   handleSave,
 }: INewColumnProps) {
-  const { table, settingsActions } = useProjectContext();
+  const { table, tableActions, settingsActions, columnMenuRef } =
+    useProjectContext();
 
   const [columnLabel, setColumnLabel] = useState("");
   const [fieldKey, setFieldKey] = useState("");
@@ -95,7 +96,6 @@ export default function NewColumn({
               helperText="Set the user-facing name for this column."
             />
           </section>
-
           <section>
             <TextField
               value={fieldKey}
@@ -139,14 +139,28 @@ export default function NewColumn({
       actions={{
         primary: {
           onClick: () => {
-            handleSave(fieldKey, {
-              type,
-              name: columnLabel,
-              fieldName: fieldKey,
-              key: fieldKey,
-              config: {},
-              ...data.initializeColumn,
-            });
+            //double check with sidney or shams about the
+            if (
+              columnMenuRef?.current?.selectedColumnHeader?.column.type ===
+              FieldType.last
+            ) {
+              tableActions?.column.add(fieldKey, {
+                type,
+                name: columnLabel,
+                fieldName: fieldKey,
+                key: fieldKey,
+                config: {},
+              });
+            } else {
+              handleSave(fieldKey, {
+                type,
+                name: columnLabel,
+                fieldName: fieldKey,
+                key: fieldKey,
+                config: {},
+                ...data.initializeColumn,
+              });
+            }
             if (requireConfiguration) {
               openSettings({
                 type,
