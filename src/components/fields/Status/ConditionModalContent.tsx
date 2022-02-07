@@ -1,8 +1,8 @@
 import _find from "lodash/find";
-import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import MultiSelect from "@rowy/multiselect";
+import { Boolean, Number, String } from "./ConditionModalContextType";
 
 export default function ConditionModalContent({
   condition,
@@ -26,53 +26,27 @@ export default function ConditionModalContent({
         multiple={false}
         label="Select data type"
       />
-      {/** This is the issue where false is causing a problem */}
-      {/** To add defaultValue into MultiSelect?*/}
-      {type === "boolean" && (
-        <MultiSelect
-          options={[
-            { label: "True", value: "true" },
-            { label: "False", value: "false" },
-          ]}
-          onChange={(v) => handleUpdate("value")(v === "true")}
-          value={value ? "true" : "false"}
-          multiple={false}
-          label="Select condition value"
-        />
-      )}
-      {type === "number" && (
-        <Grid container direction="row" justifyContent="space-between">
-          <div style={{ width: "45%" }}>
-            <MultiSelect
-              options={[
-                { label: "Less than", value: "<" },
-                { label: "Less than or equal", value: "<=" },
-                { label: "Equal", value: "==" },
-                { label: "Equal or more than", value: ">=" },
-                { label: "More than", value: ">" },
-              ]}
-              onChange={(v) => handleUpdate("operator")(v)}
-              value={operator}
-              multiple={false}
-              label="Select operator"
-            />
-          </div>
-          <TextField
-            type="number"
-            label="Value"
-            value={value}
-            onChange={(e) => handleUpdate("value")(Number(e.target.value))}
-          />
-        </Grid>
-      )}
-      {type === "string" && (
-        <TextField
-          fullWidth
-          label="Value"
-          value={value}
-          onChange={(e) => handleUpdate("value")(e.target.value)}
-        />
-      )}
+      {/** SelectModal Field Base on types. Remove Conditional */}
+      {(type) => {
+        switch (type) {
+          case "null":
+            return <></>;
+          case "number":
+            return (
+              <Number
+                value={value}
+                handleUpdate={handleUpdate}
+                operator={operator}
+              />
+            );
+          case "boolean":
+            return <Boolean value={value} handleUpdate={handleUpdate} />;
+          case "string":
+            return <String value={value} handleUpdate={handleUpdate} />;
+          default:
+            return <></>;
+        }
+      }}
       <TextField
         value={label}
         label="Label"
