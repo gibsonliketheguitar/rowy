@@ -168,6 +168,7 @@ export default function TableSettings({
     ),
     Array.isArray(collections) ? collections.filter((x) => x !== CONFIG) : []
   );
+
   const customComponents = {
     tableId: {
       component: TableId,

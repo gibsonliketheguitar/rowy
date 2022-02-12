@@ -5,6 +5,9 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import ConditionModal from "./ConditionModal";
 import ConditionList from "./ConditionList";
+import { FormDialog } from "@rowy/form-builder";
+import MultiSelect from "@rowy/multiselect";
+import { conditionSettings } from "./utils/form";
 
 export interface IConditionModal {
   isOpen: boolean;
@@ -45,6 +48,28 @@ export default function Settings({ onChange, config }: ISettingsProps) {
         conditions={config.conditions}
         setConditions={onChange("conditions")}
       />
+      w
+      <ConditionModal2
+        open={modal.isOpen}
+        isEditing={typeof modal.index === "number"}
+      />
     </>
+  );
+}
+
+function ConditionModal2({ open, isEditing }: any) {
+  const conditionFields = conditionSettings("string");
+  if (!open) return null;
+  return (
+    <FormDialog
+      fields={conditionFields}
+      onClose={() => console.log("close")}
+      title={`${isEditing ? "Edit" : "Add"} condition`}
+      values={(v) => console.log("check", v)}
+      onSubmit={(v) => console.log("check", v)}
+      SubmitButtonProps={{
+        children: isEditing ? "Edit" : "Add",
+      }}
+    />
   );
 }

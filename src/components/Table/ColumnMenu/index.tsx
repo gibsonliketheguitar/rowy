@@ -77,6 +77,9 @@ export interface IMenuModalProps {
 
 export default function ColumnMenu() {
   const [modal, setModal] = useState(INITIAL_MODAL);
+  useEffect(() => {
+    console.log(modal);
+  }, [modal]);
   const { tableState, tableActions, columnMenuRef } = useProjectContext();
   const { requestConfirmation } = useConfirmation();
 
