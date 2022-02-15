@@ -18,7 +18,7 @@ import InviteUser from "@src/components/Settings/UserManagement/InviteUser";
 
 import useCollection from "@src/hooks/useCollection";
 import useBasicSearch from "@src/hooks/useBasicSearch";
-import { USERS } from "@src/config/dbPaths";
+import { USERS, USER_INVITES } from "@src/config/dbPaths";
 
 const SEARCH_KEYS = ["id", "user.displayName", "user.email"];
 
@@ -34,6 +34,7 @@ export interface User {
 
 export default function UserManagementPage() {
   const [usersState] = useCollection({ path: USERS });
+  const [inviteState] = useCollection({ path: USER_INVITES });
   const users: User[] = usersState.documents ?? [];
   const loading = usersState.loading || !Array.isArray(usersState.documents);
 

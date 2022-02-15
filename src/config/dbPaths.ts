@@ -8,3 +8,4 @@ export const TABLE_GROUP_SCHEMAS = `${SETTINGS}/groupSchema` as const;
 
 export const USER_MANAGEMENT = `${CONFIG}/userManagement` as const;
 export const USERS = `${USER_MANAGEMENT}/users` as const;
+export const USER_INVITES = `${USER_MANAGEMENT}/invites` as const;
