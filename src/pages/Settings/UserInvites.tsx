@@ -1,24 +1,16 @@
 import { TransitionGroup } from "react-transition-group";
 
-import {
-  Container,
-  Stack,
-  Typography,
-  Paper,
-  List,
-  Fade,
-  Collapse,
-} from "@mui/material";
+import { Stack, Typography, Paper, List, Fade, Collapse } from "@mui/material";
 
 import SlideTransition from "@src/components/Modal/SlideTransition";
-import UserItem from "@src/components/Settings/UserManagement/UserItem";
 import UserSkeleton from "@src/components/Settings/UserManagement/UserSkeleton";
+import InviteItem from "@src/components/Settings/UserManagement/InviteItem";
 
 export default function UserInvites({
   loading,
   query,
   results,
-  usersState,
+  invitesState,
 }: any) {
   return (
     <>
@@ -32,8 +24,8 @@ export default function UserInvites({
         >
           <Typography variant="subtitle1" component="h2">
             {!loading && query
-              ? `${results.length} of ${usersState.documents.length}`
-              : usersState.documents.length}{" "}
+              ? `${results.length} of ${invitesState.documents.length}`
+              : invitesState.documents.length}{" "}
             Pending User Invites
           </Typography>
         </Stack>
@@ -53,9 +45,9 @@ export default function UserInvites({
           <Paper>
             <List sx={{ py: { xs: 0, sm: 1.5 }, px: { xs: 0, sm: 1 } }}>
               <TransitionGroup>
-                {results.map((user) => (
-                  <Collapse key={user.id}>
-                    <UserItem {...user} />
+                {results.map((user, index) => (
+                  <Collapse key={index + user.email}>
+                    <InviteItem {...user} />
                   </Collapse>
                 ))}
               </TransitionGroup>

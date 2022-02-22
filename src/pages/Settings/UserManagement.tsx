@@ -22,6 +22,7 @@ import { USERS, USER_INVITES } from "@src/config/dbPaths";
 import UserInvites from "./UserInvites";
 
 const SEARCH_KEYS = ["id", "user.displayName", "user.email"];
+const INVITE_SEARCH_KEYS = ["email"];
 
 export interface User {
   id: string;
@@ -33,25 +34,41 @@ export interface User {
   roles?: string[];
 }
 
+export interface Invite {
+  email: string;
+  roles?: string[];
+}
+
 export default function UserManagementPage() {
   const [usersState] = useCollection({ path: USERS });
   const [invitesState] = useCollection({ path: USER_INVITES });
+
   const users: User[] = usersState.documents ?? [];
   const loading = usersState.loading || !Array.isArray(usersState.documents);
-
   const [results, query, handleQuery] = useBasicSearch(users, SEARCH_KEYS);
+
+  const invites: Invite[] = invitesState.documents ?? [];
+  const loadingInvites =
+    usersState.loading || !Array.isArray(invitesState.documents);
+  const [invitesResult, invitesQuery, handleInviteQuery] = useBasicSearch(
+    invites,
+    INVITE_SEARCH_KEYS
+  );
 
   return (
     <Container maxWidth="sm" sx={{ px: 1, pt: 1, pb: 7 + 3 + 3 }}>
       <FloatingSearch
         label="Search users"
-        onChange={(e) => handleQuery(e.target.value)}
+        onChange={(e) => {
+          handleQuery(e.target.value);
+          handleInviteQuery(e.target.value);
+        }}
       />
       <UserInvites
-        loading={loading}
-        query={query}
-        results={results}
-        usersState={invitesState}
+        loading={loadingInvites}
+        query={invitesQuery}
+        results={invitesResult}
+        invitesState={invitesState}
       />
       <SlideTransition in timeout={100}>
         <Stack
